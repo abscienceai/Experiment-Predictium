@@ -1,0 +1,46 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "ExcelDataReader/3.7.0": {
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.dll": {
+            "assemblyVersion": "3.7.0.0",
+            "fileVersion": "3.7.0.0"
+          }
+        }
+      },
+      "ExcelDataReader.DataSet/3.7.0": {
+        "dependencies": {
+          "ExcelDataReader": "3.7.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.DataSet.dll": {
+            "assemblyVersion": "3.7.0.0",
+            "fileVersion": "3.7.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ExcelDataReader/3.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AMv3oDETRHSRyXC17rBtKH45qIfFyo433LMeaMB3u4RNr/c9Luuc0Z+JMP6+3Cx9n4wXqFqcrEIVxrf/GgYnZg==",
+      "path": "exceldatareader/3.7.0",
+      "hashPath": "exceldatareader.3.7.0.nupkg.sha512"
+    },
+    "ExcelDataReader.DataSet/3.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zA2/CVzbMspkNg0qf0/Zp+eU6VxYP5PtiJSErLDP46d/Y7F6of/NCcSGeXjs97KDq7UiEf6XJe+89s/92n2GYg==",
+      "path": "exceldatareader.dataset/3.7.0",
+      "hashPath": "exceldatareader.dataset.3.7.0.nupkg.sha512"
+    }
+  }
+}

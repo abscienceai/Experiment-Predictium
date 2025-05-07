@@ -1,0 +1,170 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0-windows7.0": {
+      "ExcelDataReader/3.7.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/ExcelDataReader.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "ExcelDataReader.DataSet/3.7.0": {
+        "type": "package",
+        "dependencies": {
+          "ExcelDataReader": "3.7.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/ExcelDataReader.DataSet.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/ExcelDataReader.DataSet.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ExcelDataReader/3.7.0": {
+      "sha512": "AMv3oDETRHSRyXC17rBtKH45qIfFyo433LMeaMB3u4RNr/c9Luuc0Z+JMP6+3Cx9n4wXqFqcrEIVxrf/GgYnZg==",
+      "type": "package",
+      "path": "exceldatareader/3.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ExcelDataReader.png",
+        "README.md",
+        "exceldatareader.3.7.0.nupkg.sha512",
+        "exceldatareader.nuspec",
+        "lib/net462/ExcelDataReader.dll",
+        "lib/net462/ExcelDataReader.pdb",
+        "lib/net462/ExcelDataReader.xml",
+        "lib/netstandard2.0/ExcelDataReader.dll",
+        "lib/netstandard2.0/ExcelDataReader.pdb",
+        "lib/netstandard2.0/ExcelDataReader.xml",
+        "lib/netstandard2.1/ExcelDataReader.dll",
+        "lib/netstandard2.1/ExcelDataReader.pdb",
+        "lib/netstandard2.1/ExcelDataReader.xml"
+      ]
+    },
+    "ExcelDataReader.DataSet/3.7.0": {
+      "sha512": "zA2/CVzbMspkNg0qf0/Zp+eU6VxYP5PtiJSErLDP46d/Y7F6of/NCcSGeXjs97KDq7UiEf6XJe+89s/92n2GYg==",
+      "type": "package",
+      "path": "exceldatareader.dataset/3.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ExcelDataReader.png",
+        "README.md",
+        "exceldatareader.dataset.3.7.0.nupkg.sha512",
+        "exceldatareader.dataset.nuspec",
+        "lib/net462/ExcelDataReader.DataSet.dll",
+        "lib/net462/ExcelDataReader.DataSet.pdb",
+        "lib/net462/ExcelDataReader.DataSet.xml",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.dll",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.pdb",
+        "lib/netstandard2.0/ExcelDataReader.DataSet.xml",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.dll",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.pdb",
+        "lib/netstandard2.1/ExcelDataReader.DataSet.xml"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0-windows7.0": [
+      "ExcelDataReader >= 3.7.0",
+      "ExcelDataReader.DataSet >= 3.7.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Yoga\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "D:\\Alper\\deneytahmin\\program\\ExperimentPredictorApp\\ExperimentPredictorApp.csproj",
+      "projectName": "ExperimentPredictorApp",
+      "projectPath": "D:\\Alper\\deneytahmin\\program\\ExperimentPredictorApp\\ExperimentPredictorApp.csproj",
+      "packagesPath": "C:\\Users\\Yoga\\.nuget\\packages\\",
+      "outputPath": "D:\\Alper\\deneytahmin\\program\\ExperimentPredictorApp\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Yoga\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0-windows7.0": {
+          "targetAlias": "net9.0-windows",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
+    },
+    "frameworks": {
+      "net9.0-windows7.0": {
+        "targetAlias": "net9.0-windows",
+        "dependencies": {
+          "ExcelDataReader": {
+            "target": "Package",
+            "version": "[3.7.0, )"
+          },
+          "ExcelDataReader.DataSet": {
+            "target": "Package",
+            "version": "[3.7.0, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WindowsForms": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
