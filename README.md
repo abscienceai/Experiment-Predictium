@@ -1,4 +1,92 @@
-# **Experiment** **Predictium (Lab Experiment Forecaster)**
+# Experiment-Predictium
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18215804.svg)](https://doi.org/10.5281/zenodo.18215804)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/abscienceai/Experiment-Predictium/releases/tag/v2.0.0)
+[![EU4MOFs](https://img.shields.io/badge/EU4MOFs-CA22147-orange.svg)](https://eu4mofs.com)
+
+![Experiment-Predictium image](image/1.png)
+![Experiment-Predictium image](image/2.png)
+![Experiment-Predictium image](image/3.png)
+![Experiment-Predictium image](image/4.png)
+![Experiment-Predictium image](image/5.png)
+![Experiment-Predictium image](image/6.png)
+![Experiment-Predictium image](image/7.png)
+![Experiment-Predictium image](image/8.png)
+![Experiment-Predictium image](image/9.png)
+![Experiment-Predictium image](image/10.png)
+![Experiment-Predictium image](image/11.png)
+
+**An open-source no-code desktop machine learning platform for experimental data prediction, benchmarking, and high-throughput screening.**
+
+Developed in the context of **EU4MOFs COST Action CA22147** (WG3 & WG4) — Virtual Mobility initiative: *MOF-Predictium: A No-Code Machine Learning Platform for MOF Property Prediction, Benchmarking, and High-Throughput Screening Using CoRE MOF DB.*
+
+---
+
+## What's New in v2.0.0
+
+> **v2.0.0 is a major update.** The original v1.0.x documentation is preserved below.
+
+### New Features
+
+| Feature | Description |
+|---------|-------------|
+| **Benchmarking Table** | Run all 7 models simultaneously. Compare RMSE, MAE, R², training time side by side. Best model highlighted. Export and reload results. |
+| **Data Quality Panel** | Per-column statistics, missing value percentages with colour-coded indicators, cleaning strategies (drop / mean / median fill). |
+| **CSV-to-Excel Wizard** | 6-step guided preparation: load CSV, select columns, boolean conversion, missing value handling, rename columns, export. |
+| **Model Interpretability** | Feature importance bar chart, SHAP value analysis, auto-generated scientific explanation text, save chart as PNG. |
+| **PDF Report** | One-click 5-page report: data summary, benchmark table, feature importance chart, scientific interpretation, prediction result. Journal supplementary ready. |
+| **Wizard Interface** | 4-step progress indicator guiding users from data loading to prediction. |
+| **Save / Load Trained** | Save trained models with metadata (description, column headers, timestamp). Load and predict without retraining. |
+| **Load Algorithm** | Load custom `.py` Python scripts or trained `.pkl` / `.pt` / `.h5` model files. |
+| **Organised Folder Structure** | Automatic creation of: `save_trained/`, `benchmark_results/`, `pdf_reports/`, `csv_wizard/`, `load_algorithm/`, `temp_models/`, `excel_data/` |
+
+### MOF-Specific Workflow (EU4MOFs CA22147)
+
+Experiment-Predictium v2.0.0 is validated on the **CoRE MOF DB** (zenodo.org/records/15621349) for structure-property prediction tasks including heat capacity, thermal stability, water stability, and solvent-removal stability.
+
+```
+CoRE MOF DB CSV  →  CSV Wizard  →  Data Quality  →  Benchmark (7 models)
+                                                          ↓
+                                               Model Interpretability (SHAP)
+                                                          ↓
+                                                  PDF Report + Zenodo
+```
+
+### System Requirements (v2.0.0)
+
+- Windows 10/11
+- .NET 9.0
+- Python 3.9+ with: `numpy`, `pandas`, `scikit-learn`, `torch`, `matplotlib`, `shap` (optional)
+- Excel files: `.xlsx` / `.xls`
+
+### Installation (v2.0.0)
+
+```bash
+pip install numpy pandas scikit-learn torch matplotlib openpyxl
+pip install shap  # optional, for SHAP interpretability
+```
+
+Download the latest release: [Experiment-Predictium-v2.0.0.zip](https://github.com/abscienceai/Experiment-Predictium/releases/tag/v2.0.0)
+
+### Citation
+
+If you use Experiment-Predictium v2.0.0, please cite:
+
+```
+Bingöl, A. (2026). Experiment-Predictium v2.0.0 (EU4MOFs CA22147).
+DOI: 10.5281/zenodo.18215804
+GitHub: github.com/abscienceai/Experiment-Predictium
+```
+
+---
+
+---
+
+# Experiment Predictium (Lab Experiment Forecaster) — v1.0.x
+
+> The following documentation describes the original v1.0.x release.
+
 ## Purpose of the Application:
 This application allows users to upload experimental data and predict future experimental outcomes using various deep learning models (LG, RFR, ANN, LSTM, GRU, TFT, CNN\_LSTM). Users can either choose from pre-built models or upload their own custom models. By uploading an Excel file containing experimental content and results, users can generate predictions.
 
@@ -15,7 +103,7 @@ This application allows users to upload experimental data and predict future exp
 ![D:\Alper\deneytahmin\batteryEx.png](image/Aspose.Words.48b2c1b2-4020-4cec-93d6-7887011d36c7.001.png)
 
 ![D:\Alper\deneytahmin\batteryExProg.png](image/Aspose.Words.48b2c1b2-4020-4cec-93d6-7887011d36c7.002.png)
-##
+
 # Scenarios for various usage areas:
 ## 1\. Chemical and Pharmaceutical Industry
 *•*Reaction Efficiency Estimation:
@@ -117,7 +205,7 @@ This application allows users to upload experimental data and predict future exp
 
 *How to Use?*
 
-*Parameters: pH Value, Coagulant Concentration (mg/L), Stirring Speed ​​(rpm)*
+*Parameters: pH Value, Coagulant Concentration (mg/L), Stirring Speed (rpm)*
 
 *Result: Suspended Solids Removal (%)*
 
@@ -128,7 +216,7 @@ This application allows users to upload experimental data and predict future exp
 
 *How to Use?*
 
-*Parameters: Emission Value (ppm), Wind Speed ​​(m/s), Humidity (%)*
+*Parameters: Emission Value (ppm), Wind Speed (m/s), Humidity (%)*
 
 *Result: PM2.5 Concentration (µg/m³)*
 
@@ -142,7 +230,7 @@ This application allows users to upload experimental data and predict future exp
 
 *Parameters: Electrolyte Concentration (M), Electrode Material, Temperature (°C)*
 
-` `*Result: Voltage Output (V)*
+*Result: Voltage Output (V)*
 
 *• Article Support Applications:*
 
@@ -164,6 +252,7 @@ This application allows users to upload experimental data and predict future exp
 *• Paint Durability Test:*
 
 ![D:\Alper\deneytahmin\k14.png](image/Aspose.Words.48b2c1b2-4020-4cec-93d6-7887011d36c7.016.png)
+
 Example: Estimating the resistance of automotive paints to UV rays.
 
 How to Use?
@@ -172,7 +261,7 @@ Parameters: UV Exposure Time (hours), Paint Thickness (µm), Humidity (%)
 
 Result: Color Fading Rate (%)
 
-## System Requirements:
+## System Requirements (v1.0.x):
 .NET Framework 4.7.2 or later
 
 For Excel files: Excel 2007+ (.xlsx) support
@@ -181,7 +270,7 @@ Required libraries for Python integration:
 
 Numpy, pandas, scikit-learn, xgboost, tensorflow, torch, pytorch-lightning, darts
 
-## Installation:
+## Installation (v1.0.x):
 ### .bat file for Windows (example name: install\_requirements.bat)
 @echo off
 
@@ -226,7 +315,7 @@ Select the model to use for prediction from the drop-down menu under "Select Mod
 From the "Number of Parameters" option, specify the number of parameters to be used (between 1 and 20). This determines the number of input parameters for the model.
 When the number of parameters is changed, the input fields are automatically updated.
 ## Data Loading:
-Click the "Load Excel Data" button to load Excel data. The data will be loaded from the Excel file and transferred to the DataGrid table. o Make sure the data is loaded correctly. Your Excel file must have enough columns (parameters + results).
+Click the "Load Excel Data" button to load Excel data. The data will be loaded from the Excel file and transferred to the DataGrid table. Make sure the data is loaded correctly. Your Excel file must have enough columns (parameters + results).
 ## Custom Model Upload:
 1. If you want to use a custom model, click the "Load Custom Model" button to select the model file. Supported file types: .zip, .h5, .pt, .pkl.
 1. The model you upload will be added to the model list and can be selected.
@@ -235,9 +324,10 @@ Click the "Load Excel Data" button to load Excel data. The data will be loaded f
 1. Make sure you fill in all the parameters. You must enter numerical values.
 
 ## Making a Guess:
-After entering your data and parameters, click the "Run Prediction" button. 
+After entering your data and parameters, click the "Run Prediction" button.
 
 The application will make a prediction based on the selected model and the given data and display the result in the text box below.
+
 ## Important Notes:
 ### Excel Data:
 Each row in the Excel file is an experiment sample. Each column represents a parameter and a result value.
@@ -248,29 +338,35 @@ If you want to use your own model, you can select the model file you uploaded. T
 ### Prediction Results:
 The prediction made is displayed in the "Prediction Result" field. This result represents the value predicted by the model.
 ### Error Messages:
-• Missing Data: All cells must be filled in. If a cell is left blank, the user will be shown an error message.
+- Missing Data: All cells must be filled in. If a cell is left blank, the user will be shown an error message.
+- Invalid Data: Parameters must be numeric. If text or invalid data is entered, the user will be shown an error message.
+- Model and Data Loading Errors: Errors encountered during Excel or model loading will be shown to the user.
 
-• Invalid Data: Parameters must be numeric. If text or invalid data is entered, the user will be shown an error message.
-
-• Model and Data Loading Errors: Errors encountered during Excel or model loading will be shown to the user.
 # Conclusion:
 ![D:\Alper\deneytahmin\fayda.png](image/Aspose.Words.48b2c1b2-4020-4cec-93d6-7887011d36c7.017.png)
 
 This application allows users to upload experimental data and predict future experimental results using various deep learning models. This way, the digitization of experimental processes and prediction with machine learning provides time, cost, resource and environmental efficiency in a wide range of areas.
-### 🎯 1. Time Saving
+
+### 1. Time Saving
 - Instead of physically performing experiments over and over again, a model trained with just a few examples can make predictions in seconds.
 - Long-term experiments and parameter ranges can be scanned virtually with the model.
-### 💰 2. Cost Reduction
+
+### 2. Cost Reduction
 - Less chemicals, materials and equipment are consumed by reducing the number of experiments.
 - Manpower, device usage and laboratory resources are saved.
-### ⚙️ 3. Energy Efficiency
-- Experiments that consume energy such as heating, cooling, UV exposure, compression are only performed when necessary. • In this way, unnecessary energy consumption is reduced.
-### 🌱 4. Environmental Impact Reduction
-- ` `Less experimentation = less waste production (chemical, plastic, energy etc.)
+
+### 3. Energy Efficiency
+- Experiments that consume energy such as heating, cooling, UV exposure, compression are only performed when necessary.
+- In this way, unnecessary energy consumption is reduced.
+
+### 4. Environmental Impact Reduction
+- Less experimentation = less waste production (chemical, plastic, energy etc.)
 - Contributes to the green laboratory approach.
-### 📈 5. Optimization and Quality Improvement
+
+### 5. Optimization and Quality Improvement
 - Targets such as maximum efficiency, durability or resolution can be achieved by manipulating input parameters.
 - Product development processes are carried out more consciously.
-### 6\. Digital R&D and Simulation Support
+
+### 6. Digital R&D and Simulation Support
 - Different formulations, conditions or scenarios can be tested in a virtual environment.
 - This supports innovation and rapid iteration in R&D processes.
