@@ -1,6 +1,6 @@
 # Experiment-Predictium
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18215804.svg)](https://doi.org/10.5281/zenodo.18215804)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20684587.svg)](https://doi.org/10.5281/zenodo.20684587)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/abscienceai/Experiment-Predictium/releases/tag/v2.0.0)
 [![EU4MOFs](https://img.shields.io/badge/EU4MOFs-CA22147-orange.svg)](https://eu4mofs.com)
@@ -75,7 +75,7 @@ If you use Experiment-Predictium v2.0.0, please cite:
 
 ```
 Bingöl, A. (2026). Experiment-Predictium v2.0.0 (EU4MOFs CA22147).
-DOI: 10.5281/zenodo.18215804
+DOI: 10.5281/zenodo.20684587
 GitHub: github.com/abscienceai/Experiment-Predictium
 ```
 
