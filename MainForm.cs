@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,6 +34,7 @@ namespace ExperimentPredictorApp
         Button btnBenchmark = null;
         Button btnViewBenchmark = null;
         Button btnDataQuality = null;
+        Button btnMofTools = null;
         Button btnInterpret = null;      // Model interpretability
         Button btnReport = null;      // Generate PDF report
         WizardStepPanel wizardPanel = null;
@@ -53,7 +54,7 @@ namespace ExperimentPredictorApp
             // ── Create required folders on startup ───────────────
             foreach (string folder in new[] {
                 "temp_models", "save_trained", "benchmark_results",
-                "load_algorithm", "pdf_reports", "csv_wizard", "excel_data" })
+                "load_algorithm", "pdf_reports", "csv_wizard", "excel_data", "vm_outputs", "docs" })
             {
                 Directory.CreateDirectory(Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory, folder));
@@ -73,7 +74,7 @@ namespace ExperimentPredictorApp
             lblModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
             cmbModel = new ComboBox() { Left = 90, Top = 44, Width = 155 };
-            cmbModel.Items.AddRange(new string[] { "LG", "RFR", "ANN", "LSTM", "GRU", "TFT", "CNN_LSTM" });
+            cmbModel.Items.AddRange(new string[] { "LG", "RFR", "ANN", "LSTM", "GRU", "TFT", "CNN_LSTM", "MOF_PREDICTIUM" });
             cmbModel.SelectedIndex = 0;
             cmbModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
@@ -97,7 +98,7 @@ namespace ExperimentPredictorApp
             btnSaveModel.FlatAppearance.MouseOverBackColor = Color.FromArgb(20, 110, 20);
             btnSaveModel.Click += SaveModelClicked;
 
-            // Benchmark button — runs all 7 models and shows comparison table
+            // Benchmark button — runs all 8 models (including MOF-Predictium) with 5-fold CV
             btnBenchmark = new Button()
             {
                 Text = "📊  Run Benchmark",
@@ -209,6 +210,25 @@ namespace ExperimentPredictorApp
             btnDataQuality.FlatAppearance.MouseOverBackColor = Color.FromArgb(140, 60, 0);
             btnDataQuality.Click += DataQualityClicked;
 
+            // MOF-Predictium advanced VM tools: robustness, OOD, multi-target, screening, maps, Pareto and inverse design
+            btnMofTools = new Button()
+            {
+                Text = "🧪  MOF VM Tools",
+                Top = 44,
+                Width = 145,
+                Height = 28,
+                Left = 720,
+                BackColor = Color.FromArgb(35, 105, 90),
+                ForeColor = Color.White,
+                Font = new Font("Calibri", 9f, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+            btnMofTools.FlatAppearance.BorderSize = 0;
+            btnMofTools.FlatAppearance.MouseOverBackColor = Color.FromArgb(25, 80, 70);
+            btnMofTools.Click += MofToolsClicked;
+
             // Load Saved Model button
             btnLoadModel = new Button()
             {
@@ -318,6 +338,7 @@ namespace ExperimentPredictorApp
             this.Controls.Add(btnInterpret);
             this.Controls.Add(btnReport);
             this.Controls.Add(btnDataQuality);
+            this.Controls.Add(btnMofTools);
 
             inputPanel = new Panel()
             {
@@ -544,7 +565,7 @@ namespace ExperimentPredictorApp
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
             string filePath = ofd.FileName;
-            string ext = Path.GetExtension(filePath).ToLower();
+            string ext = Path.GetExtension(filePath).ToLowerInvariant();
             string fileName = Path.GetFileNameWithoutExtension(filePath);
 
             if (ext == ".py")
@@ -1345,7 +1366,7 @@ namespace ExperimentPredictorApp
             }
         }
 
-        // Run all 7 models on current data and show comparison table
+        // Run all 8 models on current data and show holdout + 5-fold CV comparison table
         private async void BenchmarkClicked(object sender, EventArgs e)
         {
             // Build training CSV from grid data
@@ -1486,7 +1507,7 @@ namespace ExperimentPredictorApp
             {
                 // No metadata — try to detect model type from filename
                 foreach (string item in cmbModel.Items)
-                    if (modelFile.ToUpper().Contains(item.ToUpper()))
+                    if (modelFile.Contains(item, StringComparison.OrdinalIgnoreCase))
                     { cmbModel.SelectedItem = item; break; }
 
                 restoredInfo = "  (no metadata found — fill parameters manually)";
@@ -1496,5 +1517,43 @@ namespace ExperimentPredictorApp
             txtPrediction.BackColor = Color.FromArgb(240, 244, 255);
             txtPrediction.Text = "📂  Model loaded: " + modelFile + restoredInfo;
         }
+
+        // Open the advanced MOF-Predictium VM toolbox. Numeric training data currently
+        // visible in the main grid are passed to the robustness and HT-screening modules.
+        private void MofToolsClicked(object sender, EventArgs e)
+        {
+            string trainingCsv = BuildCurrentTrainingCsv();
+            var form = new AdvancedMofToolsForm(trainingCsv, new List<string>(columnHeaders));
+            form.ShowDialog(this);
+        }
+
+        private string BuildCurrentTrainingCsv()
+        {
+            int paramCount = (int)numParameters.Value;
+            var culture = CultureInfo.InvariantCulture;
+            var lines = new List<string>();
+
+            foreach (DataGridViewRow row in dataGrid.Rows)
+            {
+                if (row.IsNewRow) continue;
+                var vals = new List<string>();
+                bool valid = true;
+                for (int i = 0; i <= paramCount; i++)
+                {
+                    string raw = row.Cells[i].Value?.ToString()?.Trim() ?? "";
+                    raw = raw.Replace(",", ".");
+                    if (!double.TryParse(raw, NumberStyles.Any, culture, out double value))
+                    {
+                        valid = false;
+                        break;
+                    }
+                    vals.Add(value.ToString("G", culture));
+                }
+                if (valid) lines.Add(string.Join(",", vals));
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+
     }
 }

@@ -556,7 +556,7 @@ namespace ExperimentPredictorApp
                 foreach (var c in boolCols)
                     txtSummary.AppendText("  • " + c + "\n");
             }
-            txtSummary.AppendText("\nMISSING VALUES: " + missStrategy.ToUpper() + "\n");
+            txtSummary.AppendText("\nMISSING VALUES: " + missStrategy.ToUpperInvariant() + "\n");
             txtSummary.AppendText("OUTPUT FOLDER: " + outputDir + "\n");
 
             var lblOut = MakeLabel("Output folder:", 16, 268, 120, 22);

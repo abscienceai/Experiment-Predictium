@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -13,15 +14,25 @@ namespace ExperimentPredictorApp
         private Label lblInfo;
         private Label lblBest;
 
+        private static readonly string[] ColumnNames =
+        {
+            "Model", "Holdout RMSE ↓", "Holdout MAE ↓", "Holdout MAPE % ↓", "Holdout R² ↑",
+            "CV RMSE (mean ± SD) ↓", "CV MAE (mean ± SD) ↓", "CV MAPE % (mean ± SD) ↓",
+            "CV R² (mean ± SD) ↑", "Time (s)", "Status"
+        };
+
+        private static readonly int[] ColumnWidths =
+        {
+            145, 115, 110, 125, 105, 165, 160, 175, 155, 90, 190
+        };
+
         public BenchmarkForm(string jsonResult, string targetName, int sampleCount)
         {
             InitUI(jsonResult, targetName, sampleCount);
         }
 
-        // Constructor for viewing a previously saved benchmark CSV
         public BenchmarkForm(string csvFilePath)
         {
-            // Parse CSV file and reconstruct display
             string targetName = "—";
             int sampleCount = 0;
             var rows = new List<string[]>();
@@ -38,7 +49,7 @@ namespace ExperimentPredictorApp
                         var part = line.Replace("# Samples:", "").Split('|')[0].Trim();
                         int.TryParse(part, out sampleCount);
                     }
-                    else if (line.StartsWith("# Best model"))
+                    else if (line.StartsWith("# Best model label:"))
                         bestLine = line.Replace("# Best model label:", "").Trim();
                     else if (line.StartsWith("#") || line.StartsWith("Model,") ||
                              string.IsNullOrWhiteSpace(line))
@@ -53,52 +64,27 @@ namespace ExperimentPredictorApp
                 return;
             }
 
-            InitFromCSV(rows, targetName, sampleCount, bestLine,
-                        Path.GetFileName(csvFilePath));
+            InitFromCSV(rows, targetName, sampleCount, bestLine, Path.GetFileName(csvFilePath));
         }
 
-        // Build UI directly from parsed CSV rows
-        private void InitFromCSV(List<string[]> rows, string targetName,
-                                  int sampleCount, string bestLine, string fileName)
+        private void ConfigureWindow(string title)
         {
-            this.Text = "Benchmark Results — " + fileName;
-            this.Size = new Size(820, 420);
-            this.MinimumSize = new Size(700, 350);
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = Color.White;
-            this.Font = new Font("Calibri", 9.5f);
+            Text = title;
+            Size = new Size(1460, 500);
+            MinimumSize = new Size(1050, 400);
+            StartPosition = FormStartPosition.CenterParent;
+            BackColor = Color.White;
+            Font = new Font("Calibri", 9.5f);
+        }
 
-            lblInfo = new Label()
-            {
-                Text = "Target: " + targetName + "   |   Samples: " + sampleCount +
-                             "   |   Split: 80% train / 20% test   |   File: " + fileName,
-                Left = 16,
-                Top = 10,
-                Width = 780,
-                Height = 20,
-                ForeColor = Color.FromArgb(80, 80, 80),
-                Font = new Font("Calibri", 8.5f, FontStyle.Italic),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            lblBest = new Label()
-            {
-                Text = string.IsNullOrWhiteSpace(bestLine) ? "" : "🏆  " + bestLine,
-                Left = 16,
-                Top = 32,
-                Width = 780,
-                Height = 22,
-                ForeColor = Color.FromArgb(20, 120, 20),
-                Font = new Font("Calibri", 9f, FontStyle.Bold),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            grid = new DataGridView()
+        private DataGridView CreateGrid()
+        {
+            var g = new DataGridView()
             {
                 Left = 16,
-                Top = 58,
-                Width = this.ClientSize.Width - 32,
-                Height = this.ClientSize.Height - 100,
+                Top = 62,
+                Width = ClientSize.Width - 32,
+                Height = ClientSize.Height - 108,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
@@ -109,76 +95,78 @@ namespace ExperimentPredictorApp
                 BorderStyle = BorderStyle.FixedSingle,
                 GridColor = Color.FromArgb(220, 220, 220),
                 BackgroundColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom |
-                                AnchorStyles.Left | AnchorStyles.Right,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(31, 92, 153),
                     ForeColor = Color.White,
-                    Font = new Font("Calibri", 9.5f, FontStyle.Bold),
-                    Alignment = DataGridViewContentAlignment.MiddleCenter
+                    Font = new Font("Calibri", 9f, FontStyle.Bold),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.True
                 },
-                ColumnHeadersHeightSizeMode =
-                    DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
-                ColumnHeadersHeight = 32,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+                ColumnHeadersHeight = 44,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
-                    Font = new Font("Calibri", 9.5f),
+                    Font = new Font("Calibri", 9f),
                     Alignment = DataGridViewContentAlignment.MiddleCenter
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(247, 249, 252)
-                }
+                },
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
             };
 
-            string[] colNames = { "Model", "RMSE ↓", "MAE ↓", "R² ↑", "Time (s)", "Status" };
-            int[] colWidths = { 110, 130, 130, 110, 90, 155 };
-            for (int i = 0; i < colNames.Length; i++)
+            for (int i = 0; i < ColumnNames.Length; i++)
             {
-                grid.Columns.Add(new DataGridViewTextBoxColumn
+                g.Columns.Add(new DataGridViewTextBoxColumn
                 {
-                    HeaderText = colNames[i],
-                    Width = colWidths[i],
+                    HeaderText = ColumnNames[i],
+                    Width = ColumnWidths[i],
                     SortMode = DataGridViewColumnSortMode.NotSortable
                 });
             }
+            return g;
+        }
 
-            // Find best R² to highlight
-            double bestR2 = double.MinValue;
-            int bestRowIdx = -1;
-
-            foreach (var r in rows)
+        private Label CreateInfoLabel(string text)
+        {
+            return new Label()
             {
-                if (r.Length < 6) continue;
-                grid.Rows.Add(r[0], r[1], r[2], r[3], r[4], r[5]);
-                int idx = grid.Rows.Count - 1;
-                if (double.TryParse(r[3], System.Globalization.NumberStyles.Any,
-                    System.Globalization.CultureInfo.InvariantCulture, out double rv)
-                    && rv > bestR2)
-                { bestR2 = rv; bestRowIdx = idx; }
-            }
+                Text = text,
+                Left = 16,
+                Top = 10,
+                Width = ClientSize.Width - 32,
+                Height = 20,
+                ForeColor = Color.FromArgb(80, 80, 80),
+                Font = new Font("Calibri", 8.5f, FontStyle.Italic),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+        }
 
-            if (bestRowIdx >= 0)
+        private Label CreateBestLabel(string text = "")
+        {
+            return new Label()
             {
-                grid.CellFormatting += (s, e) =>
-                {
-                    if (e.RowIndex == bestRowIdx)
-                    {
-                        e.CellStyle.BackColor = Color.FromArgb(210, 245, 210);
-                        e.CellStyle.ForeColor = Color.FromArgb(10, 80, 10);
-                        e.CellStyle.Font = new Font("Calibri", 9.5f, FontStyle.Bold);
-                    }
-                };
-                grid.Rows[bestRowIdx].Cells[0].Value =
-                    "🏆 " + grid.Rows[bestRowIdx].Cells[0].Value;
-            }
+                Text = text,
+                Left = 16,
+                Top = 33,
+                Width = ClientSize.Width - 32,
+                Height = 24,
+                ForeColor = Color.FromArgb(20, 120, 20),
+                Font = new Font("Calibri", 9f, FontStyle.Bold),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+        }
 
-            var btnClose = new Button()
+        private Button CreateCloseButton()
+        {
+            var b = new Button()
             {
                 Text = "Close",
-                Left = this.ClientSize.Width - 110,
-                Top = this.ClientSize.Height - 36,
+                Left = ClientSize.Width - 110,
+                Top = ClientSize.Height - 36,
                 Width = 90,
                 Height = 26,
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
@@ -188,109 +176,84 @@ namespace ExperimentPredictorApp
                 Font = new Font("Calibri", 9f, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
-            btnClose.FlatAppearance.BorderSize = 0;
-            btnClose.Click += (s, e) => this.Close();
+            b.FlatAppearance.BorderSize = 0;
+            b.Click += (s, e) => Close();
+            return b;
+        }
 
-            this.Controls.Add(lblInfo);
-            this.Controls.Add(lblBest);
-            this.Controls.Add(grid);
-            this.Controls.Add(btnClose);
+        private void HighlightBestRow(int bestRowIdx)
+        {
+            if (bestRowIdx < 0) return;
+            grid.CellFormatting += (s, e) =>
+            {
+                if (e.RowIndex == bestRowIdx)
+                {
+                    e.CellStyle.BackColor = Color.FromArgb(210, 245, 210);
+                    e.CellStyle.ForeColor = Color.FromArgb(10, 80, 10);
+                    e.CellStyle.Font = new Font("Calibri", 9f, FontStyle.Bold);
+                }
+            };
+            grid.Rows[bestRowIdx].Cells[0].Value = "🏆 " + grid.Rows[bestRowIdx].Cells[0].Value;
+        }
+
+        private void InitFromCSV(List<string[]> rows, string targetName,
+                                 int sampleCount, string bestLine, string fileName)
+        {
+            ConfigureWindow("Benchmark Results — " + fileName);
+            lblInfo = CreateInfoLabel(
+                "Target: " + targetName + "   |   Samples: " + sampleCount +
+                "   |   Holdout: 80/20, seed 42   |   Cross-validation: 5-fold   |   File: " + fileName);
+            lblBest = CreateBestLabel(string.IsNullOrWhiteSpace(bestLine) ? "" : "🏆  " + bestLine);
+            grid = CreateGrid();
+
+            double bestCvR2 = double.MinValue;
+            int bestRowIdx = -1;
+
+            foreach (var r in rows)
+            {
+                // VM benchmark CSV has 11 columns. Old v2.0 CSV had 6 columns.
+                if (r.Length >= 11)
+                {
+                    grid.Rows.Add(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]);
+                    int idx = grid.Rows.Count - 1;
+                    string cvR2Text = r[8].Split('±')[0].Trim();
+                    if (double.TryParse(cvR2Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double cvR2)
+                        && cvR2 > bestCvR2)
+                    {
+                        bestCvR2 = cvR2;
+                        bestRowIdx = idx;
+                    }
+                }
+                else if (r.Length >= 6)
+                {
+                    // Backward-compatible display for v2.0 files.
+                    grid.Rows.Add(r[0], r[1], r[2], "—", r[3], "—", "—", "—", "—", r[4], r[5]);
+                }
+            }
+
+            HighlightBestRow(bestRowIdx);
+            Controls.Add(lblInfo);
+            Controls.Add(lblBest);
+            Controls.Add(grid);
+            Controls.Add(CreateCloseButton());
         }
 
         private void InitUI(string jsonResult, string targetName, int sampleCount)
         {
-            this.Text = "Benchmark Results — Experiment-Predictium";
-            this.Size = new Size(820, 420);
-            this.MinimumSize = new Size(700, 350);
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = Color.White;
-            this.Font = new Font("Calibri", 9.5f);
+            ConfigureWindow("Benchmark Results — Experiment-Predictium v2.2.0-VM");
+            lblInfo = CreateInfoLabel(
+                "Target: " + targetName + "   |   Samples: " + sampleCount +
+                "   |   Holdout: 80% train / 20% test, seed 42   |   Cross-validation: 5-fold");
+            lblBest = CreateBestLabel();
+            grid = CreateGrid();
 
-            // ── Header info label ─────────────────────────────────
-            lblInfo = new Label()
-            {
-                Text = "Target: " + targetName + "   |   Samples: " + sampleCount +
-                             "   |   Split: 80% train / 20% test   |   Seed: 42",
-                Left = 16,
-                Top = 10,
-                Width = 780,
-                Height = 20,
-                ForeColor = Color.FromArgb(80, 80, 80),
-                Font = new Font("Calibri", 8.5f, FontStyle.Italic),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            // ── Best model label ──────────────────────────────────
-            lblBest = new Label()
-            {
-                Text = "",
-                Left = 16,
-                Top = 32,
-                Width = 780,
-                Height = 22,
-                ForeColor = Color.FromArgb(20, 120, 20),
-                Font = new Font("Calibri", 9f, FontStyle.Bold),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            // ── Results DataGridView ──────────────────────────────
-            grid = new DataGridView()
-            {
-                Left = 16,
-                Top = 58,
-                Width = this.ClientSize.Width - 32,
-                Height = this.ClientSize.Height - 100,
-                ReadOnly = true,
-                AllowUserToAddRows = false,
-                AllowUserToDeleteRows = false,
-                AllowUserToResizeRows = false,
-                RowHeadersVisible = false,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                EnableHeadersVisualStyles = false,
-                BorderStyle = BorderStyle.FixedSingle,
-                GridColor = Color.FromArgb(220, 220, 220),
-                BackgroundColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom |
-                               AnchorStyles.Left | AnchorStyles.Right,
-                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-                {
-                    BackColor = Color.FromArgb(31, 92, 153),
-                    ForeColor = Color.White,
-                    Font = new Font("Calibri", 9.5f, FontStyle.Bold),
-                    Alignment = DataGridViewContentAlignment.MiddleCenter
-                },
-                ColumnHeadersHeightSizeMode =
-                    DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
-                ColumnHeadersHeight = 32,
-                DefaultCellStyle = new DataGridViewCellStyle
-                {
-                    Font = new Font("Calibri", 9.5f),
-                    Alignment = DataGridViewContentAlignment.MiddleCenter
-                }
-            };
-
-            // Define columns
-            string[] colNames = { "Model", "RMSE ↓", "MAE ↓", "R² ↑", "Time (s)", "Status" };
-            int[] colWidths = { 110, 130, 130, 110, 90, 155 };
-
-            for (int i = 0; i < colNames.Length; i++)
-            {
-                var col = new DataGridViewTextBoxColumn
-                {
-                    HeaderText = colNames[i],
-                    Width = colWidths[i],
-                    SortMode = DataGridViewColumnSortMode.NotSortable
-                };
-                grid.Columns.Add(col);
-            }
-
-            // ── Parse JSON and fill rows ──────────────────────────
-            double bestR2 = double.MinValue;
+            double bestCvR2 = double.MinValue;
             int bestRowIdx = -1;
+            List<BenchmarkResult> list = null;
 
             try
             {
-                var list = JsonSerializer.Deserialize<List<BenchmarkResult>>(jsonResult);
+                list = JsonSerializer.Deserialize<List<BenchmarkResult>>(jsonResult);
                 if (list == null) return;
 
                 foreach (var r in list)
@@ -300,47 +263,38 @@ namespace ExperimentPredictorApp
 
                     grid.Rows.Add(
                         r.model,
-                        hasError ? "—" : r.rmse.ToString("F5"),
-                        hasError ? "—" : r.mae.ToString("F5"),
-                        hasError ? "—" : r.r2.ToString("F4"),
-                        r.time.ToString("F1") + " s",
+                        hasError ? "—" : r.rmse.ToString("F5", CultureInfo.InvariantCulture),
+                        hasError ? "—" : r.mae.ToString("F5", CultureInfo.InvariantCulture),
+                        hasError ? "—" : r.mape.ToString("F2", CultureInfo.InvariantCulture),
+                        hasError ? "—" : r.r2.ToString("F4", CultureInfo.InvariantCulture),
+                        hasError ? "—" : FormatMeanSd(r.cv_rmse_mean, r.cv_rmse_std, 5),
+                        hasError ? "—" : FormatMeanSd(r.cv_mae_mean, r.cv_mae_std, 5),
+                        hasError ? "—" : FormatMeanSd(r.cv_mape_mean, r.cv_mape_std, 2),
+                        hasError ? "—" : FormatMeanSd(r.cv_r2_mean, r.cv_r2_std, 4),
+                        r.time.ToString("F1", CultureInfo.InvariantCulture),
                         status
                     );
 
                     int rowIdx = grid.Rows.Count - 1;
-
-                    // Style error rows
                     if (hasError)
                     {
                         grid.Rows[rowIdx].DefaultCellStyle.ForeColor = Color.FromArgb(160, 40, 40);
                         grid.Rows[rowIdx].DefaultCellStyle.BackColor = Color.FromArgb(255, 245, 245);
                     }
-
-                    // Track best R²
-                    if (!hasError && r.r2 > bestR2)
+                    else if (r.cv_r2_mean > bestCvR2)
                     {
-                        bestR2 = r.r2;
+                        bestCvR2 = r.cv_r2_mean;
                         bestRowIdx = rowIdx;
                     }
                 }
 
-                // Highlight best model row
                 if (bestRowIdx >= 0)
                 {
-                    var bestStyle = grid.Rows[bestRowIdx].DefaultCellStyle;
-                    bestStyle.BackColor = Color.FromArgb(210, 245, 210);
-                    bestStyle.ForeColor = Color.FromArgb(10, 80, 10);
-                    bestStyle.Font = new Font("Calibri", 9.5f, FontStyle.Bold);
-
-                    // Add trophy to model name
-                    grid.Rows[bestRowIdx].Cells[0].Value =
-                        "🏆 " + grid.Rows[bestRowIdx].Cells[0].Value;
-
-                    lblBest.Text = "🏆  Best model: " +
-                        list[bestRowIdx].model +
-                        "   R² = " + bestR2.ToString("F4") +
-                        "   RMSE = " + list[bestRowIdx].rmse.ToString("F5") +
-                        "   MAE = " + list[bestRowIdx].mae.ToString("F5");
+                    var best = list[bestRowIdx];
+                    lblBest.Text = "🏆  Best by mean 5-fold CV R²: " + best.model +
+                        "   CV R² = " + FormatMeanSd(best.cv_r2_mean, best.cv_r2_std, 4) +
+                        "   |   Holdout R² = " + best.r2.ToString("F4", CultureInfo.InvariantCulture) +
+                        "   |   Holdout RMSE = " + best.rmse.ToString("F5", CultureInfo.InvariantCulture);
                 }
             }
             catch (Exception ex)
@@ -348,29 +302,13 @@ namespace ExperimentPredictorApp
                 lblBest.Text = "Parse error: " + ex.Message;
             }
 
-            // ── Alternating row colours ───────────────────────────
-            grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(247, 249, 252)
-            };
+            HighlightBestRow(bestRowIdx);
 
-            // Re-apply best row highlight (alternating rows override it otherwise)
-            grid.CellFormatting += (s, e) =>
-            {
-                if (e.RowIndex == bestRowIdx)
-                {
-                    e.CellStyle.BackColor = Color.FromArgb(210, 245, 210);
-                    e.CellStyle.ForeColor = Color.FromArgb(10, 80, 10);
-                    e.CellStyle.Font = new Font("Calibri", 9.5f, FontStyle.Bold);
-                }
-            };
-
-            // ── Save Results button ───────────────────────────────
             var btnSave = new Button()
             {
                 Text = "💾  Save Results",
                 Left = 16,
-                Top = this.ClientSize.Height - 36,
+                Top = ClientSize.Height - 36,
                 Width = 140,
                 Height = 26,
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
@@ -381,66 +319,46 @@ namespace ExperimentPredictorApp
                 Cursor = Cursors.Hand
             };
             btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.FlatAppearance.MouseOverBackColor = Color.FromArgb(20, 110, 20);
             btnSave.Click += (s, e) => SaveResults(targetName, sampleCount);
 
-            // ── Close button ──────────────────────────────────────
-            var btnClose = new Button()
-            {
-                Text = "Close",
-                Left = this.ClientSize.Width - 110,
-                Top = this.ClientSize.Height - 36,
-                Width = 90,
-                Height = 26,
-                Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(31, 92, 153),
-                ForeColor = Color.White,
-                Font = new Font("Calibri", 9f, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnClose.FlatAppearance.BorderSize = 0;
-            btnClose.Click += (s, e) => this.Close();
-
-            this.Controls.Add(lblInfo);
-            this.Controls.Add(lblBest);
-            this.Controls.Add(grid);
-            this.Controls.Add(btnSave);
-            this.Controls.Add(btnClose);
+            Controls.Add(lblInfo);
+            Controls.Add(lblBest);
+            Controls.Add(grid);
+            Controls.Add(btnSave);
+            Controls.Add(CreateCloseButton());
         }
 
-        // Save benchmark results as CSV
+        private static string FormatMeanSd(double mean, double sd, int decimals)
+        {
+            string f = "F" + decimals;
+            return mean.ToString(f, CultureInfo.InvariantCulture) + " ± " +
+                   sd.ToString(f, CultureInfo.InvariantCulture);
+        }
+
         private void SaveResults(string targetName, int sampleCount)
         {
-            using var sfd = new System.Windows.Forms.SaveFileDialog();
+            using var sfd = new SaveFileDialog();
             sfd.Title = "Save Benchmark Results";
             sfd.Filter = "CSV File (*.csv)|*.csv|Text File (*.txt)|*.txt";
-            sfd.FileName = "benchmark_" + targetName + "_" +
-                           DateTime.Now.ToString("yyyyMMdd_HHmm") + ".csv";
-
+            sfd.FileName = "benchmark_" + targetName + "_" + DateTime.Now.ToString("yyyyMMdd_HHmm") + ".csv";
             if (sfd.ShowDialog() != DialogResult.OK) return;
 
             var sb = new System.Text.StringBuilder();
-
-            // Header info
-            sb.AppendLine("# Experiment-Predictium — Benchmark Results");
+            sb.AppendLine("# Experiment-Predictium v2.2.0-VM — Benchmark Results");
             sb.AppendLine("# Target: " + targetName);
-            sb.AppendLine("# Samples: " + sampleCount + " | Split: 80/20 | Seed: 42");
+            sb.AppendLine("# Samples: " + sampleCount + " | Holdout: 80/20 | Seed: 42 | Cross-validation: 5-fold");
+            sb.AppendLine("# MAPE note: percentage metric is epsilon-protected for zero/near-zero targets.");
             sb.AppendLine("# Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-            sb.AppendLine("# Best model label: " + lblBest.Text.Replace("#", "").Trim());
+            sb.AppendLine("# Best model label: " + lblBest.Text.Replace("🏆", "").Trim());
             sb.AppendLine();
+            sb.AppendLine("Model,Holdout_RMSE,Holdout_MAE,Holdout_MAPE_pct,Holdout_R2,CV_RMSE_mean_sd,CV_MAE_mean_sd,CV_MAPE_pct_mean_sd,CV_R2_mean_sd,Time_s,Status");
 
-            // Column headers
-            sb.AppendLine("Model,RMSE,MAE,R2,Time_s,Status");
-
-            // Data rows
             foreach (DataGridViewRow row in grid.Rows)
             {
                 if (row.IsNewRow) continue;
                 var cells = new string[row.Cells.Count];
                 for (int i = 0; i < row.Cells.Count; i++)
                 {
-                    // Remove trophy emoji for clean CSV
                     string val = row.Cells[i].Value?.ToString() ?? "";
                     val = val.Replace("🏆 ", "").Replace(",", ";");
                     cells[i] = val;
@@ -448,20 +366,26 @@ namespace ExperimentPredictorApp
                 sb.AppendLine(string.Join(",", cells));
             }
 
-            System.IO.File.WriteAllText(sfd.FileName, sb.ToString(),
-                System.Text.Encoding.UTF8);
-
-            MessageBox.Show("Results saved to: " + System.IO.Path.GetFileName(sfd.FileName),
+            File.WriteAllText(sfd.FileName, sb.ToString(), System.Text.Encoding.UTF8);
+            MessageBox.Show("Results saved to: " + Path.GetFileName(sfd.FileName),
                 "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // JSON deserialization helper
         private class BenchmarkResult
         {
             public string model { get; set; }
             public double rmse { get; set; }
             public double mae { get; set; }
+            public double mape { get; set; }
             public double r2 { get; set; }
+            public double cv_rmse_mean { get; set; }
+            public double cv_rmse_std { get; set; }
+            public double cv_mae_mean { get; set; }
+            public double cv_mae_std { get; set; }
+            public double cv_mape_mean { get; set; }
+            public double cv_mape_std { get; set; }
+            public double cv_r2_mean { get; set; }
+            public double cv_r2_std { get; set; }
             public double time { get; set; }
             public string error { get; set; }
         }

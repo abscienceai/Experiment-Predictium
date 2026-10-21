@@ -13,10 +13,24 @@ namespace ExperimentPredictorApp
             string scriptsDir = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory, "python_scripts");
 
-            // Benchmark uses benchmark.py, others use predict_{model}.py
-            string scriptPath = modelName.ToLower() == "benchmark"
-                ? Path.Combine(scriptsDir, "benchmark.py")
-                : Path.Combine(scriptsDir, $"predict_{modelName.ToLower()}.py");
+            // Normalize model names with invariant casing. This avoids locale-specific
+            // transformations on Turkish Windows (for example I -> ı), which would
+            // otherwise generate invalid script names such as predict_mof_predıctıum.py.
+            string modelKey = (modelName ?? string.Empty).Trim().ToUpperInvariant();
+            string scriptFile = modelKey switch
+            {
+                "BENCHMARK" => "benchmark.py",
+                "LG" => "predict_lg.py",
+                "RFR" => "predict_rfr.py",
+                "ANN" => "predict_ann.py",
+                "LSTM" => "predict_lstm.py",
+                "GRU" => "predict_gru.py",
+                "TFT" => "predict_tft.py",
+                "CNN_LSTM" => "predict_cnn_lstm.py",
+                "MOF_PREDICTIUM" => "predict_mof_predictium.py",
+                _ => $"predict_{(modelName ?? string.Empty).Trim().ToLowerInvariant()}.py"
+            };
+            string scriptPath = Path.Combine(scriptsDir, scriptFile);
 
             string tempTrainFile = Path.Combine(scriptsDir, "temp_training.csv");
             File.WriteAllText(tempTrainFile, trainingCsv);
@@ -25,7 +39,7 @@ namespace ExperimentPredictorApp
             if (string.IsNullOrEmpty(pythonPath))
                 return "Error: Python not found. Please install Python and add it to PATH.";
 
-            // Build arguments � model path is optional 3rd argument
+            // Build arguments — model path is optional 3rd argument
             string args = $"\"{scriptPath}\" \"{Path.GetFileName(tempTrainFile)}\" \"{predictInput}\"";
             if (!string.IsNullOrEmpty(modelPath))
                 args += $" \"{modelPath}\"";
@@ -55,7 +69,7 @@ namespace ExperimentPredictorApp
         // Determine the appropriate file extension for each model type
         public static string GetModelExtension(string modelName)
         {
-            return modelName.ToUpper() switch
+            return (modelName ?? string.Empty).Trim().ToUpperInvariant() switch
             {
                 "LG" => ".pkl",
                 "RFR" => ".pkl",
@@ -64,6 +78,7 @@ namespace ExperimentPredictorApp
                 "GRU" => ".pt",
                 "TFT" => ".pt",
                 "CNN_LSTM" => ".pt",
+                "MOF_PREDICTIUM" => ".pkl",
                 _ => ".pkl"
             };
         }

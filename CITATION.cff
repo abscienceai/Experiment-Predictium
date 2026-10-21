@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use Experiment-Predictium in research, please cite this software release."
+title: "Experiment-Predictium v2.3.0-VM-RR: A No-Code Scientific Machine Learning Platform with MOF-Predictium, High-Throughput Screening, and Inter-Laboratory Reproducibility Tools"
+type: software
+authors:
+  - family-names: "Bingöl"
+    given-names: "Alper"
+    orcid: "https://orcid.org/0009-0003-4437-2439"
+    affiliation: "İnönü University"
+version: "2.3.0-VM-RR"
+date-released: "2026-10-19"
+doi: "10.5281/zenodo.23462328"
+license: MIT
+repository-code: "https://github.com/abscienceai/Experiment-Predictium"
+url: "https://doi.org/10.5281/zenodo.23462328"
+keywords:
+  - machine learning
+  - materials informatics
+  - metal-organic frameworks
+  - MOF-Predictium
+  - high-throughput screening
+  - inverse design
+  - uncertainty quantification
+  - reproducibility
+  - inter-laboratory reproducibility
+  - energy storage
